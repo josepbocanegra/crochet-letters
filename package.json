@@ -1,0 +1,22 @@
+{
+  "name": "crochet-letters",
+  "version": "1.0.0",
+  "description": "Turns a letter or digit into a crochet stitch chart and exports it as an A4 PDF.",
+  "license": "MIT",
+  "author": "Josep Bocanegra <josepboc@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josepbocanegra/crochet-letters.git"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning tests/logic.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^6.0.6"
+  }
+}
