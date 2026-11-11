@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crochet letter</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Black+Ops+One&family=Bungee&family=Fraunces:wght@700&family=Fredoka:wght@600&family=Lilita+One&family=Luckiest+Guy&family=Nunito:wght@700&family=Oswald:wght@600&family=Roboto+Mono:wght@500&family=Silkscreen&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <svg class="yarn" viewBox="0 0 64 64" aria-hidden="true">
+          <circle cx="32" cy="34" r="18" fill="#ebdbf0" />
+          <circle cx="32" cy="34" r="18" fill="none" stroke="#863267" stroke-width="2.2" />
+          <path
+            d="M20 34c4-7 8-7 12 0s8 7 12 0"
+            fill="none"
+            stroke="#863267"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M22 40c5-4 8-4 12 0s7 4 10 0"
+            fill="none"
+            stroke="#b983a5"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+          <path
+            d="M46 28c6-2 10 1 12 6"
+            fill="none"
+            stroke="#863267"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        <div>
+          <p class="eyebrow">A pattern for your hook</p>
+          <h1>Crochet letter</h1>
+        </div>
+      </div>
+      <form id="controls">
+        <label>
+          Character
+          <input id="letter" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Letter or number" />
+        </label>
+        <label>
+          Width
+          <input id="width" inputmode="numeric" autocomplete="off" />
+        </label>
+        <label>
+          Height
+          <input id="height" inputmode="numeric" autocomplete="off" />
+        </label>
+        <label>
+          Font
+          <select id="font"></select>
+        </label>
+        <label>
+          Colour
+          <input id="letter-color" type="color" value="#32243f" />
+        </label>
+        <label>
+          Background
+          <span class="pair">
+            <select id="paper-mode"></select>
+            <input id="paper-color" type="color" value="#fbf8fd" aria-label="Background colour" />
+          </span>
+        </label>
+        <label>
+          <span>Filled at <span id="ink-value">50%</span></span>
+          <input
+            id="ink"
+            type="range"
+            min="5"
+            max="95"
+            step="1"
+            value="50"
+            aria-label="Percentage of a square that must be ink"
+          />
+        </label>
+        <button id="download" type="button" disabled>Download PDF</button>
+      </form>
+      <p id="status" role="status"></p>
+    </header>
+    <main>
+      <section class="sheet">
+        <div id="chart" aria-label="Stitch chart"></div>
+        <p class="legend">Each square is one single crochet. Row 1 sits at the bottom, and odd rows start on the right.</p>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

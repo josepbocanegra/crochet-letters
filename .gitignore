@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+# Per-installation deploy settings (see deploy/deploy.env.example)
+deploy/deploy.env
+.vite
+*.tsbuildinfo
+.DS_Store
