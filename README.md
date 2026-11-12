@@ -36,6 +36,7 @@ so the font picker needs network access.
 | `src/raster.ts` | Draws the glyph on a canvas and loads the web font |
 | `src/trace.ts` | Turns the glyph bitmap into the stitch grid |
 | `src/pdf.ts` | A4 PDF writer (page geometry, cells, row numbers) |
+| `src/layout.ts` | How big a square may be so the chart fits the screen |
 | `src/main.ts` | DOM wiring, state, chart rendering, downloads |
 | `deploy/` | Script and nginx vhost for a self-hosted deployment |
 

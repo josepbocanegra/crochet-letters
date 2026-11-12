@@ -20,6 +20,7 @@ import {
 import { buildPdf } from './pdf.ts'
 import { traceLetter } from './raster.ts'
 import { BACKGROUND_MODES, backgroundFor, normalizeHex, type BackgroundMode } from './color.ts'
+import { fitCellSize, type FitBox } from './layout.ts'
 
 const letterInput = document.querySelector<HTMLInputElement>('#letter')
 const widthInput = document.querySelector<HTMLInputElement>('#width')
@@ -55,7 +56,6 @@ if (
   throw new Error('The page is missing a control.')
 }
 
-document.documentElement.style.setProperty('--cell', `${CELL_PX}px`)
 document.documentElement.style.setProperty('--ink', INK)
 document.documentElement.style.setProperty('--grid-line', GRID_LINE)
 
@@ -150,11 +150,87 @@ function paintCell(button: HTMLButtonElement, y: number, x: number, on: boolean)
   )
 }
 
+/** Smallest square worth tapping, in pixels. */
+const CELL_MIN = 8
+/** Below this the squares stop being squares; better to let the page scroll. */
+const CELL_COMFORTABLE = 12
+
+function toPx(value: string): number {
+  return parseFloat(value) || 0
+}
+
+/** Space the chart may use: the scrolling area minus every padding in the way. */
+function chartSpace(): { width: number; height: number } {
+  const sheet = chart!.parentElement
+  if (!sheet) return { width: 0, height: 0 }
+  const mainStyle = getComputedStyle(scroller!)
+  const sheetStyle = getComputedStyle(sheet)
+  const legend = sheet.querySelector<HTMLElement>('.legend')
+  const legendStyle = legend ? getComputedStyle(legend) : null
+  const legendHeight =
+    legend && legendStyle
+      ? legend.getBoundingClientRect().height + toPx(legendStyle.marginTop) + toPx(legendStyle.marginBottom)
+      : 0
+
+  return {
+    width:
+      scroller!.clientWidth -
+      toPx(mainStyle.paddingLeft) -
+      toPx(mainStyle.paddingRight) -
+      toPx(sheetStyle.paddingLeft) -
+      toPx(sheetStyle.paddingRight),
+    height:
+      scroller!.clientHeight -
+      toPx(mainStyle.paddingTop) -
+      toPx(mainStyle.paddingBottom) -
+      toPx(sheetStyle.paddingTop) -
+      toPx(sheetStyle.paddingBottom) -
+      legendHeight,
+  }
+}
+
+/**
+ * Sizes the squares so the whole chart — row numbers and legend included — is
+ * on screen. The maths lives in layout.ts; this only measures the page, and it
+ * measures the scrolling area rather than the card, which grows with the chart.
+ */
+let paintedCell = 0
+function fitChart(): void {
+  const space = chartSpace()
+  const chartStyle = getComputedStyle(chart!)
+  const box: FitBox = {
+    columns: state.width,
+    rows: state.height,
+    availableWidth: space.width,
+    availableHeight: space.height,
+    labelWidth: toPx(getComputedStyle(document.documentElement).getPropertyValue('--label-w')),
+    gap: toPx(chartStyle.columnGap) || 1,
+    padding: toPx(chartStyle.paddingTop) || 1,
+    min: CELL_MIN,
+    max: CELL_PX,
+    comfortable: CELL_COMFORTABLE,
+  }
+  const cell = fitCellSize(box)
+  // Only write when it changes: the observer below would otherwise react to its
+  // own layout changes.
+  if (cell > 0 && cell !== paintedCell) {
+    paintedCell = cell
+    document.documentElement.style.setProperty('--cell', `${cell}px`)
+  }
+}
+
+// Rotating the phone or resizing the window changes the room available without
+// changing the chart, so the fit has to be redone. No rAF here: a dropped frame
+// would leave the chart at the wrong size for good.
+new ResizeObserver(() => fitChart()).observe(scroller!)
+window.addEventListener('resize', fitChart)
+window.addEventListener('orientationchange', fitChart)
+
 function renderChart(): void {
   const scrollTop = scroller!.scrollTop
   const scrollLeft = scroller!.scrollLeft
   chart!.replaceChildren()
-  chart!.style.gridTemplateColumns = `2.4rem repeat(${state.width}, var(--cell)) 2.4rem`
+  chart!.style.gridTemplateColumns = `var(--label-w) repeat(${state.width}, var(--cell)) var(--label-w)`
   chart!.dataset.ready = state.cells ? 'true' : 'false'
   chart!.dataset.letter = state.letter
   chart!.dataset.font = state.fontId
@@ -168,6 +244,7 @@ function renderChart(): void {
     const onRight = rowStartsOnRight(rowNumber)
     chart!.append(rowLabel(rowNumber, 'left', !onRight), ...cellsForRow(y), rowLabel(rowNumber, 'right', onRight))
   }
+  fitChart()
   scroller!.scrollTop = scrollTop
   scroller!.scrollLeft = scrollLeft
 }
@@ -388,5 +465,7 @@ downloadButton.addEventListener('click', () => {
   URL.revokeObjectURL(url)
 })
 
+fitChart()
 applyColors()
 void retrace()
+

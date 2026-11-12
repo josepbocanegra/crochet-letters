@@ -9,6 +9,7 @@ import {
 import { backgroundFor, hexToRgb, normalizeHex, rgbToHex, rgbToHsl, hslToRgb, type DerivedMode } from '../src/color.ts'
 import { buildPdf, pdfLiteral } from '../src/pdf.ts'
 import { blankGrid, inkBounds, traceInk } from '../src/trace.ts'
+import { chartHeight, chartWidth, fitCellSize, type FitBox } from '../src/layout.ts'
 
 let failed = 0
 
@@ -235,6 +236,57 @@ const defaultColoured = pdfText(
   }),
 )
 assert(defaultColoured.includes('0.2 0.14 0.25 rg'), 'pdf falls back to the default ink colour')
+
+// --- Fitting the chart into whatever space the screen gives it --------------
+const phone: FitBox = {
+  columns: 16,
+  rows: 20,
+  availableWidth: 344,
+  availableHeight: 500,
+  labelWidth: 26,
+  gap: 1,
+  padding: 1,
+  min: 8,
+  max: 20,
+  comfortable: 12,
+}
+
+const phoneCell = fitCellSize(phone)
+assertEqual(phoneCell, 17, 'a 16x20 chart fits a phone at 17px cells')
+assert(chartWidth(phone, phoneCell) <= phone.availableWidth, 'the fitted chart is never wider than its box')
+assert(chartHeight(phone, phoneCell) <= phone.availableHeight, 'the fitted chart is never taller than its box')
+assertEqual(fitCellSize({ ...phone, availableWidth: 1440, availableHeight: 700 }), 20, 'a roomy screen stops at the design size')
+assertEqual(
+  fitCellSize({ ...phone, availableWidth: 0 }),
+  8,
+  'a collapsed box never goes below the minimum',
+)
+assertEqual(fitCellSize({ ...phone, availableWidth: Number.NaN }), 8, 'an unmeasurable box falls back to the minimum')
+assertEqual(fitCellSize({ ...phone, columns: 0 }), 8, 'no columns means no chart, not a crash')
+assertEqual(
+  fitCellSize({ ...phone, columns: 80, rows: 80 }),
+  8,
+  'an 80x80 chart on a phone keeps the minimum and lets the page scroll',
+)
+
+// A tall chart on a wide screen is limited by height, not by width.
+const tall = fitCellSize({ ...phone, rows: 40, availableWidth: 1200, availableHeight: 700 })
+assertEqual(tall, 16, 'a tall chart shrinks until it fits the height')
+assert(chartHeight({ rows: 40, gap: 1, padding: 1 }, tall) <= 700, 'the height-limited chart fits the height')
+
+// Short screens are not allowed to turn the squares into dots: past the
+// comfortable size the chart keeps its width-sized cells and the page scrolls.
+assertEqual(
+  fitCellSize({ ...phone, availableHeight: 300 }),
+  13,
+  'a short screen shrinks the cells down to the comfortable size',
+)
+assertEqual(
+  fitCellSize({ ...phone, availableHeight: 250 }),
+  17,
+  'a screen too short to be worth it keeps readable cells and scrolls',
+)
+assertEqual(fitCellSize({ ...phone, availableHeight: 60 }), 17, 'a sliver of height never shrinks the chart to nothing')
 
 if (failed > 0) {
   console.error(`${failed} failed`)

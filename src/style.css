@@ -11,6 +11,7 @@
   --line: #e0d2ea;
   --muted: #645170;
   --cell: 20px;
+  --label-w: 38px;
   --ctrl-h: 2.6rem;
   --letter-color: #32243f;
   --paper-color: #fbf8fd;
@@ -27,6 +28,9 @@ body {
   isolation: isolate;
   margin: 0;
   height: 100vh;
+  /* Mobile browsers hand out a viewport taller than what is visible while the
+     toolbars are up; dvh tracks the real one so the chart is not cropped. */
+  height: 100dvh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
@@ -270,6 +274,11 @@ main {
   background: var(--card);
   border: 1px solid #e5d9ef;
   border-radius: 22px;
+  /* Belt and braces: the squares are sized to fit (src/layout.ts), but if a
+     chart is ever wider than the card it scrolls inside it instead of spilling
+     over the rounded frame. */
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 22px 50px rgba(58, 40, 82, 0.09);
@@ -291,7 +300,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 2.4rem;
+  min-width: var(--label-w);
   background: #f3ebf8;
   color: var(--muted);
   font-size: 11px;
@@ -328,20 +337,128 @@ main {
 }
 
 @media (max-width: 720px) {
+  :root {
+    --ctrl-h: 2.3rem;
+    --label-w: 26px;
+  }
+
   header {
-    padding: 1rem 1rem 0.9rem;
+    padding: 0.6rem 0.75rem 0.55rem;
+  }
+
+  .brand {
+    gap: 0.55rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .yarn {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .eyebrow {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
   }
 
   h1 {
-    font-size: 1.7rem;
+    font-size: 1.4rem;
+  }
+
+  /* Eight controls used to stack into eight rows. Three named areas pack the
+     same eight into three rows, and the chart gets what is left. */
+  form {
+    display: grid;
+    gap: 0.45rem 0.5rem;
+    grid-template-columns: 4.1rem minmax(0, 1fr) minmax(0, 1fr) 3.2rem;
+    grid-template-areas:
+      "letter width height colour"
+      "font font paper paper"
+      "ink ink download download";
+    align-items: end;
+  }
+
+  .field-letter {
+    grid-area: letter;
+  }
+
+  .field-width {
+    grid-area: width;
+  }
+
+  .field-height {
+    grid-area: height;
+  }
+
+  .field-colour {
+    grid-area: colour;
+  }
+
+  .field-font {
+    grid-area: font;
+  }
+
+  .field-paper {
+    grid-area: paper;
+  }
+
+  .field-ink {
+    grid-area: ink;
+  }
+
+  /* 16px is the size iOS refuses to zoom in on when a field takes focus. */
+  input,
+  select {
+    font-size: 1rem;
+  }
+
+  #letter {
+    width: 100%;
+    font-size: 1.15rem;
+  }
+
+  #width,
+  #height,
+  #ink {
+    width: 100%;
+  }
+
+  #font,
+  #paper-mode {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pair #paper-mode {
+    flex: 1 1 auto;
+  }
+
+  #download {
+    grid-area: download;
+    height: var(--ctrl-h);
+    padding: 0 0.6rem;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  #status {
+    min-height: 1rem;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
   }
 
   main {
-    padding: 1.1rem 0.75rem 2rem;
+    padding: 0.7rem 0.6rem 1rem;
   }
 
   .sheet {
-    padding: 0.8rem 0.7rem 0.75rem;
+    padding: 0.6rem 0.55rem 0.55rem;
     border-radius: 16px;
+  }
+
+  .legend {
+    margin-top: 0.55rem;
+    font-size: 0.72rem;
+    line-height: 1.35;
   }
 }
