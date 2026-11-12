@@ -47,34 +47,34 @@
         </div>
       </div>
       <form id="controls">
-        <label>
+        <label class="field-letter">
           Character
           <input id="letter" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Letter or number" />
         </label>
-        <label>
+        <label class="field-width">
           Width
           <input id="width" inputmode="numeric" autocomplete="off" />
         </label>
-        <label>
+        <label class="field-height">
           Height
           <input id="height" inputmode="numeric" autocomplete="off" />
         </label>
-        <label>
+        <label class="field-font">
           Font
           <select id="font"></select>
         </label>
-        <label>
+        <label class="field-colour">
           Colour
-          <input id="letter-color" type="color" value="#32243f" />
+          <input id="letter-color" type="color" value="#32243f" aria-label="Letter colour" />
         </label>
-        <label>
+        <label class="field-paper">
           Background
           <span class="pair">
             <select id="paper-mode"></select>
             <input id="paper-color" type="color" value="#fbf8fd" aria-label="Background colour" />
           </span>
         </label>
-        <label>
+        <label class="field-ink">
           <span>Filled at <span id="ink-value">50%</span></span>
           <input
             id="ink"
