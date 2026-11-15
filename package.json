@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Turns a letter or digit into a crochet stitch chart and exports it as an A4 PDF.",
   "license": "MIT",
-  "author": "Josep Bocanegra <josepboc@gmail.com>",
+  "author": "Josep Bocanegra <156319+josepbocanegra@users.noreply.github.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/josepbocanegra/crochet-letters.git"
