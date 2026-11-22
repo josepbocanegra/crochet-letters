@@ -82,7 +82,13 @@ export function chartWidth(
   return 2 * fit.padding + 2 * fit.labelWidth + fit.columns * cell + (tracks(fit.columns) - 1) * fit.gap
 }
 
-/** Height the chart will actually occupy once `cell` is chosen. */
+/**
+ * Height the chart will actually occupy once `cell` is chosen.
+ *
+ * Every row is one stitch tall — `#chart` pins `grid-auto-rows` to the cell — so
+ * this is the real height and not an approximation that the row-number labels
+ * could quietly break.
+ */
 export function chartHeight(fit: Pick<FitBox, 'rows' | 'gap' | 'padding'>, cell: number): number {
   return 2 * fit.padding + fit.rows * cell + (fit.rows - 1) * fit.gap
 }

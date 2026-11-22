@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import {
   commitInkPercent,
   commitStitchCount,
@@ -287,6 +288,32 @@ assertEqual(
   'a screen too short to be worth it keeps readable cells and scrolls',
 )
 assertEqual(fitCellSize({ ...phone, availableHeight: 60 }), 17, 'a sliver of height never shrinks the chart to nothing')
+
+// --- A row must be exactly one stitch tall ----------------------------------
+// The chart is a CSS grid; if a row is sized by its tallest item the row-number
+// label grows the row past the stitch, the stitch turns into a rectangle and the
+// letter looks stretched. The two rules that keep rows square live in the CSS,
+// so they are checked here against the stylesheet itself.
+const css = readFileSync(new URL('../src/style.css', import.meta.url), 'utf8')
+
+function rule(selector: string): string {
+  const start = css.indexOf(`\n${selector} {`)
+  if (start < 0) return ''
+  return css.slice(start, css.indexOf('}', start))
+}
+
+assert(
+  /grid-auto-rows:\s*var\(--cell\)/.test(rule('#chart')),
+  '#chart gives every row the height of one stitch (grid-auto-rows: var(--cell))',
+)
+assert(
+  /font-size:\s*[^;]*var\(--cell\)/.test(rule('.row-num')),
+  '.row-num follows the stitch size, so a label can never stretch a row',
+)
+assert(
+  !/font-size:\s*\d+px/.test(rule('.row-num')),
+  '.row-num has no fixed font-size that would outgrow a small stitch',
+)
 
 if (failed > 0) {
   console.error(`${failed} failed`)

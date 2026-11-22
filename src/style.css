@@ -288,6 +288,11 @@ main {
   display: grid;
   width: max-content;
   gap: 1px;
+  /* A row is exactly one stitch tall. Without this the grid rows are sized by
+     their tallest item — the row-number label — so an 11px digit stretches an
+     8px stitch into a 16px one and the letter looks pulled upwards. The label
+     has to fit the stitch, never the other way round. */
+  grid-auto-rows: var(--cell);
   padding: 1px;
   background: var(--grid-line);
   margin-inline: auto;
@@ -300,12 +305,19 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  min-height: 0;
   min-width: var(--label-w);
+  padding: 0;
   background: #f3ebf8;
   color: var(--muted);
-  font-size: 11px;
+  /* The number follows the stitch, as it does in the PDF (src/pdf.ts), so a
+     small chart keeps square rows instead of growing them to fit the type. */
+  font-size: clamp(7px, calc(var(--cell) * 0.8), 11px);
+  line-height: 1;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  overflow: hidden;
 }
 
 .cell {
